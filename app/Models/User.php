@@ -39,16 +39,37 @@ class User extends Authenticatable
     }
 
     /**
+     * Password encryption.
+     *  
+     * @var string  $value
+     * @return void
+     */
+    public function setPasswordAttribute($value) {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
      * Rules for validation.
      *
      * @return array<string, mixed>
      */
-    public function rules(): array
+    public static function rules($isUpdate = false)
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
         ];
+
+        if($isUpdate) {
+            $rules = [
+                'name' => 'sometimes|string|max:255',
+                'email' => 'sometimes|string|email|max:255|unique:users',
+                'password' => 'sometimes|string|min:8',
+            ];
+        }
+
+        return $rules;
     }
 }
