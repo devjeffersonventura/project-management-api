@@ -20,9 +20,9 @@ class Project extends Model
         'status',
     ];
 
-    public function project()
+    public function tasks()
     {
-        return $this->belongsTo(Project::class);
+        return $this->hasMany(Task::class);
     }
 
     public static function validate(array $data, $isUpdate = false)
