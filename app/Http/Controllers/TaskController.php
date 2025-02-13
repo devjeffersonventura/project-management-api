@@ -47,14 +47,14 @@ class TaskController extends Controller
             return response()->json(['message' => 'Tarefa não encontrada'], 404);
         }
 
-        $validator = Validator::make($request->all(), Task::rules());
+        $validator = Validator::make($request->all(), Task::rules(true));
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $task->update($request->all());
-
+        $task->update($request->only(['title', 'description', 'creation_date', 'completion_date', 'status']));
+        
         return response()->json($task);
     }
 

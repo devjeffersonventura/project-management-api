@@ -47,13 +47,13 @@ class ProjectController extends Controller
             return response()->json(['message' => 'Projeto não encontrado'], 404);
         }
 
-        $validator = Validator::make($request->all(), Project::rules());
+        $validator = Validator::make($request->all(), Project::rules(true));
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $project->update($request->all());
+        $project->update($request->only(['name', 'description', 'start_date', 'end_date', 'status']));
 
         return response()->json($project);
     }
