@@ -30,7 +30,7 @@ class Project extends Model
             'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|in:pending,in_progress,completed',
+            'status' => 'required|in:planned,in_progress,completed',
         ];
     
         if ($isUpdate) {
@@ -39,7 +39,7 @@ class Project extends Model
                 'description' => 'nullable|string',
                 'start_date' => 'sometimes|date',
                 'end_date' => 'sometimes|date|after_or_equal:start_date',
-                'status' => 'sometimes|in:pending,in_progress,completed',
+                'status' => 'required|in:planned,in_progress,completed',
             ];
         }
     
