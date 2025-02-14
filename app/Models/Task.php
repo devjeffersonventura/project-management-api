@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Notifications\TaskCompleted;
 
 class Task extends Model
 {
@@ -47,5 +48,14 @@ class Task extends Model
         }        
 
         return $rules;
+    }
+
+    protected static function booted()
+    {
+        static::updated(function ($task) {
+            if ($task->isDirty('status') && $task->status === 'completed') {
+                $task->project->user->notify(new TaskCompleted($task));
+            }
+        });
     }
 }
