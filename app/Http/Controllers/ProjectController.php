@@ -5,12 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::all();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->isAdmin()) {
+            $projects = Project::all();
+        } else {
+            $projects = $user->projects;
+        }
+
         return response()->json($projects);
     }
 
@@ -33,7 +42,9 @@ class ProjectController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $user = Auth::user();
         $project = new Project($request->all());
+        $project->user_id = $user->id;
         $project->save();
 
         return response()->json($project, 201);
