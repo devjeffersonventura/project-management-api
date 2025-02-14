@@ -14,6 +14,10 @@ class ProjectController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        if (!$user) {
+            return response()->json(['error' => 'Usuário não autenticado'], 401);
+        }
+
         if ($user->isAdmin()) {
             $projects = Project::all();
         } else {
@@ -25,10 +29,16 @@ class ProjectController extends Controller
 
     public function show($id)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();       
         $project = Project::find($id);
 
         if (!$project) {
             return response()->json(['message' => 'Projeto não encontrado'], 404);
+        }
+
+        if (!$user->isAdmin() && $project->user_id !== $user->id) {
+            return response()->json(['error' => 'Acesso não autorizado'], 403);
         }
 
         return response()->json($project);
@@ -41,7 +51,6 @@ class ProjectController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
         $user = Auth::user();
         $project = new Project($request->all());
         $project->user_id = $user->id;
@@ -52,10 +61,15 @@ class ProjectController extends Controller
 
     public function update(Request $request, $id)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         $project = Project::find($id);
-
         if (!$project) {
             return response()->json(['message' => 'Projeto não encontrado'], 404);
+        }
+
+        if (!$user->isAdmin() && $project->user_id !== $user->id) {
+            return response()->json(['error' => 'Acesso não autorizado'], 403);
         }
 
         $validator = Validator::make($request->all(), Project::rules(true));
@@ -71,12 +85,17 @@ class ProjectController extends Controller
 
     public function destroy($id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $project = Project::find($id);
 
         if (!$project) {
             return response()->json(['message' => 'Projeto não encontrado'], 404);
         }
 
+        if (!$user->isAdmin() && $project->user_id !== $user->id) {
+            return response()->json(['error' => 'Acesso não autorizado'], 403);
+        }
 
         $project->delete();
 
