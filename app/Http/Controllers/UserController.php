@@ -14,7 +14,17 @@ use Illuminate\Http\Response;
 class UserController
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/users",
+     *     summary="List all users",
+     *     tags={"Users"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of users",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *     )
+     * )
      */
     public function index()
     {
@@ -23,7 +33,25 @@ class UserController
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/users",
+     *     summary="Create a new user",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password"},
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created",
+     *         @OA\JsonContent(ref="#/components/schemas/User")
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -59,9 +87,33 @@ class UserController
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/users/{id}",
+     *     summary="Update user",
+     *     tags={"Users"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated",
+     *         @OA\JsonContent(ref="#/components/schemas/User")
+     *     )
+     * )
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $user = User::find($id);
     
@@ -86,9 +138,24 @@ class UserController
     }
     
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/users/{id}",
+     *     summary="Delete user",
+     *     tags={"Users"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted"
+     *     )
+     * )
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $user = User::find($id);
 
@@ -101,6 +168,30 @@ class UserController
         return response()->json(['message' => 'Usuário excluido com sucesso']);
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/users/{id}/role",
+     *     summary="Update user role",
+     *     tags={"Users"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="role", type="string", enum={"admin", "user"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Role updated successfully"
+     *     )
+     * )
+     */
     public function updateRole(Request $request, $id)
     {
         /** @var \App\Models\User $authenticatedUser */
