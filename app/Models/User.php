@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Enums\UserRole;
 
 class User extends Authenticatable
 {
@@ -34,6 +35,10 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected $casts = [
+        'role' => UserRole::class
+    ];
+
     public function projects()
     {
         return $this->hasMany(Project::class);
@@ -49,14 +54,14 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === UserRole::ADMIN;
     }
 
-    public function isUser()
+    public function isUser(): bool
     {
-        return $this->role === 'user';
+        return $this->role === UserRole::USER;
     }    
 
     /**
@@ -64,21 +69,17 @@ class User extends Authenticatable
      *
      * @return array<string, mixed>
      */
-    public static function rules($isUpdate = false)
+    public static function rules($isUpdate = false): array
     {
-
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:8'
         ];
 
-        if($isUpdate) {
-            $rules = [
-                'name' => 'sometimes|string|max:255',
-                'email' => 'sometimes|string|email|max:255|unique:users',
-                'password' => 'sometimes|string|min:8',
-            ];
+        if ($isUpdate) {
+            $rules['email'] = 'sometimes|string|email|max:255|unique:users';
+            $rules['password'] = 'sometimes|string|min:8';
         }
 
         return $rules;

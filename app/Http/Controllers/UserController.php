@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
+
 
 class UserController
 {
@@ -29,7 +33,13 @@ class UserController
             return response()->json($validator->errors(), 422);
         }
 
-        $user = User::create($request->all());
+        // Remove role do request se estiver presente
+        $userData = $request->except('role');
+        
+        // Define role como 'user' por padrão
+        $userData['role'] = UserRole::USER;
+
+        $user = User::create($userData);
 
         return response()->json($user, 201);
     }
@@ -89,5 +99,49 @@ class UserController
         $user->delete();    
 
         return response()->json(['message' => 'Usuário excluido com sucesso']);
+    }
+
+    public function updateRole(Request $request, $id)
+    {
+        /** @var \App\Models\User $authenticatedUser */
+        $authenticatedUser = Auth::user();
+
+        // Apenas admins podem alterar roles
+        if (!$authenticatedUser->isAdmin()) {
+            return response()->json([
+                'message' => 'Não autorizado. Apenas administradores podem alterar roles.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Usuário não encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'role' => 'required|in:admin,user'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Impedir que o admin remova seu próprio privilégio
+        if ($user->id === $authenticatedUser->id && $request->role !== 'admin') {
+            return response()->json([
+                'message' => 'Não é possível remover seus próprios privilégios de administrador'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $user->role = $request->role;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Role atualizada com sucesso',
+            'user' => $user
+        ]);
     }
 }
