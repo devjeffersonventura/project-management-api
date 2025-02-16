@@ -1,0 +1,928 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Project Management API Documentation",
+        "description": "API documentation for Project Management System",
+        "contact": {
+            "email": "your-email@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/v1",
+            "description": "Local API Server"
+        }
+    ],
+    "paths": {
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "List all projects",
+                "operationId": "07f276c6e629646d087ee4b728e1234c",
+                "responses": {
+                    "200": {
+                        "description": "List of projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Project"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create a new project",
+                "operationId": "d91af95183d5934b42aec1325d5165db",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project details",
+                "operationId": "4c45d4f68ff6ca2929032424e6da2639",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update project",
+                "operationId": "546bd69cc1e45c7e4a50c3da131d0969",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProjectRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Delete project",
+                "operationId": "ef93971582acea3d860c54c21c5fd8e5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reports/projects": {
+            "get": {
+                "tags": [
+                    "Project Reports"
+                ],
+                "summary": "Get projects report",
+                "description": "Get report of all projects with task statistics",
+                "operationId": "ddb42054d6417de26bcef2b9cd049b95",
+                "responses": {
+                    "200": {
+                        "description": "Projects report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "project_name": {
+                                                "type": "string",
+                                                "example": "Project Name"
+                                            },
+                                            "total_tasks": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "completed_tasks": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "in_progress_tasks": {
+                                                "type": "integer",
+                                                "example": 3
+                                            },
+                                            "pending_tasks": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "completion_rate": {
+                                                "type": "string",
+                                                "example": "50%"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized - Only admins can access this report"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "List all tasks",
+                "operationId": "6a93d54730cde509d735e538ab6800f6",
+                "responses": {
+                    "200": {
+                        "description": "List of tasks",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Task"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Create a new task",
+                "operationId": "9b481c0ed5fdfa1a592d70ba39a348ee",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "project_id",
+                                    "creation_date",
+                                    "completion_date",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "creation_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "completion_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "in_progress",
+                                            "completed"
+                                        ]
+                                    },
+                                    "project_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Task created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tasks/{id}": {
+            "put": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Update task",
+                "operationId": "85377ff0e935f093dd75ea6886923dbc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "creation_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "completion_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "in_progress",
+                                            "completed"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Delete task",
+                "operationId": "5ed5dfd4c645e9398f4282969bfe6478",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects/{id}/tasks": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get tasks by project",
+                "operationId": "937f0273c165f4039c9c5bd6f9f5cab3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of tasks for project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "project": {
+                                            "type": "string"
+                                        },
+                                        "tasks": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Task"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List all users",
+                "operationId": "7e2f5799553ec93c9c43e2a58490d447",
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "operationId": "a1fce870c566eb5fc0cf3178ec5d2fed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "operationId": "ddfe232db1870b82493bf8bd25596d37",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "operationId": "43dd20becb1f47444e484cbb18ce345c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}/role": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user role",
+                "operationId": "5360df3a545695b0854805231d4d2c98",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "user"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Role updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Project": {
+                "title": "Project",
+                "description": "Project model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Project Name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Project Description"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-02-15"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-03-15"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "planned",
+                            "in_progress",
+                            "completed"
+                        ]
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Rua Example, 123"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Project"
+                }
+            },
+            "ProjectReport": {
+                "title": "Project Report",
+                "description": "Project report model",
+                "properties": {
+                    "project_name": {
+                        "type": "string",
+                        "example": "Project Name"
+                    },
+                    "total_tasks": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "completed_tasks": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "in_progress_tasks": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "pending_tasks": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "completion_rate": {
+                        "type": "string",
+                        "example": "50%"
+                    }
+                },
+                "type": "object"
+            },
+            "Task": {
+                "title": "Task",
+                "description": "Task model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Task Title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Task Description"
+                    },
+                    "creation_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-02-15"
+                    },
+                    "completion_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-03-15"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "in_progress",
+                            "completed"
+                        ]
+                    },
+                    "project_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "admin",
+                            "user"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "ProjectRequest": {
+                "title": "Project Request",
+                "description": "Project request body data",
+                "required": [
+                    "name",
+                    "start_date",
+                    "end_date",
+                    "status"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Project Name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Project Description"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-02-15"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-03-15"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "planned",
+                            "in_progress",
+                            "completed"
+                        ]
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Rua Example, 123"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Projects",
+            "description": "Projects"
+        },
+        {
+            "name": "Project Reports",
+            "description": "Project Reports"
+        },
+        {
+            "name": "Tasks",
+            "description": "Tasks"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        }
+    ]
+}
