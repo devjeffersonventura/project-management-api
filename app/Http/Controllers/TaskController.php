@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
@@ -69,5 +71,26 @@ class TaskController extends Controller
         $task->delete();
 
         return response()->json(['message' => 'Tarefa excluída com sucesso']);
+    }
+
+    public function getTasksByProject($projectId)
+    {
+        // Verifica se o projeto existe
+        $project = Project::find($projectId);
+        
+        if (!$project) {
+            return response()->json([
+                'message' => 'Projeto não encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $tasks = Task::where('project_id', $projectId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'project' => $project->name,
+            'tasks' => $tasks
+        ]);
     }
 }
