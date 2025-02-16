@@ -6,6 +6,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProjectResource;
 
 class ProjectController extends Controller
 {
@@ -19,19 +20,21 @@ class ProjectController extends Controller
         }
 
         if ($user->isAdmin()) {
-            $projects = Project::all();
+            $projects = Project::with('user')->get();
         } else {
-            $projects = $user->projects;
+            $projects = Project::with('user')
+                ->where('user_id', $user->id)
+                ->get();
         }
 
-        return response()->json($projects);
+        return ProjectResource::collection($projects);
     }
 
     public function show($id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();       
-        $project = Project::find($id);
+        $project = Project::with('user')->find($id);
 
         if (!$project) {
             return response()->json(['message' => 'Projeto não encontrado'], 404);
@@ -41,29 +44,37 @@ class ProjectController extends Controller
             return response()->json(['error' => 'Acesso não autorizado'], 403);
         }
 
-        return response()->json($project);
+        return new ProjectResource($project);
     }
 
     public function store(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuário não autenticado'], 401);
+        }
+
         $validator = Validator::make($request->all(), Project::rules());
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        $user = Auth::user();
+
         $project = new Project($request->all());
         $project->user_id = $user->id;
         $project->save();
 
-        return response()->json($project, 201);
+        return new ProjectResource($project);
     }
 
     public function update(Request $request, $id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $project = Project::find($id);
+        $project = Project::with('user')->find($id);
+
         if (!$project) {
             return response()->json(['message' => 'Projeto não encontrado'], 404);
         }
@@ -78,9 +89,17 @@ class ProjectController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $project->update($request->only(['name', 'description', 'start_date', 'end_date', 'status']));
-
-        return response()->json($project);
+        $project->update($request->only([
+            'name', 
+            'description', 
+            'start_date', 
+            'end_date', 
+            'status',
+            'cep',
+            'location'
+        ]));
+        
+        return new ProjectResource($project);
     }
 
     public function destroy($id)
