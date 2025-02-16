@@ -10,6 +10,20 @@ use App\Http\Resources\ProjectResource;
 
 class ProjectController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/projects",
+     *     summary="List all projects",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of projects",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Project"))
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
     public function index()
     {
         /** @var \App\Models\User $user */
@@ -30,6 +44,26 @@ class ProjectController extends Controller
         return ProjectResource::collection($projects);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/projects/{id}",
+     *     summary="Get project details",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project details",
+     *         @OA\JsonContent(ref="#/components/schemas/Project")
+     *     ),
+     *     @OA\Response(response=404, description="Project not found")
+     * )
+     */
     public function show($id)
     {
         /** @var \App\Models\User $user */
@@ -47,6 +81,24 @@ class ProjectController extends Controller
         return new ProjectResource($project);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/projects",
+     *     summary="Create a new project",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ProjectRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Project created",
+     *         @OA\JsonContent(ref="#/components/schemas/Project")
+     *     ),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(Request $request)
     {
         /** @var \App\Models\User $user */
@@ -69,6 +121,29 @@ class ProjectController extends Controller
         return new ProjectResource($project);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/projects/{id}",
+     *     summary="Update project",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ProjectRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project updated",
+     *         @OA\JsonContent(ref="#/components/schemas/Project")
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         /** @var \App\Models\User $user */
@@ -102,6 +177,24 @@ class ProjectController extends Controller
         return new ProjectResource($project);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/projects/{id}",
+     *     summary="Delete project",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project deleted"
+     *     )
+     * )
+     */
     public function destroy($id)
     {
         /** @var User $user */
