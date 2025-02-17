@@ -83,3 +83,64 @@ php artisan serve
 ```bash
 php artisan queue:work
 ```
+
+## 🧪 Testes
+
+### Configuração
+O projeto utiliza PHPUnit para testes automatizados. Os testes são configurados para usar transações de banco de dados, garantindo que os dados de teste não persistam após a execução.
+
+### Executando os Testes
+Executar todos os testes
+```bash
+php artisan test
+```
+Executar testes específicos
+```bash
+php artisan test tests/Feature/UserRegistrationTest.php
+php artisan test tests/Unit/ProjectProgressCalculatorTest.php
+php artisan test tests/Unit/ProjectDurationCalculatorTest.php
+```
+
+
+### Estrutura de Testes
+
+#### Testes de Integração (Feature)
+- `UserRegistrationTest`: Valida o fluxo de registro de usuários
+  - Criação de usuário
+  - Validação de campos
+  - Persistência no banco
+  - Estrutura da resposta
+
+#### Testes Unitários (Unit)
+- `ProjectProgressCalculatorTest`: Testa cálculos de progresso do projeto
+  - Porcentagem de tarefas completadas
+  - Tratamento de projetos sem tarefas
+  
+- `ProjectDurationCalculatorTest`: Testa cálculos de duração do projeto
+  - Dias estimados entre datas
+  - Tratamento de datas específicas
+
+### Factories
+O projeto utiliza factories para gerar dados de teste consistentes:
+
+- `UserFactory`: Geração de usuários
+- `ProjectFactory`: Geração de projetos com status e datas
+- `TaskFactory`: Geração de tarefas com diferentes status
+
+### Serviços Testados
+- `ProjectProgressCalculator`: Cálculo de progresso do projeto
+- `ProjectHoursCalculator`: Cálculo de horas do projeto
+- `ProjectDurationCalculator`: Cálculo de duração do projeto
+
+### Ambiente de Testes
+- Utiliza `DatabaseTransactions` para limpeza automática
+- Implementa Enums para validação de status
+- Dados realistas através de factories
+- Isolamento de banco de dados
+
+### Cobertura de Testes
+- Registro de Usuário: 100%
+- Cálculos de Projeto: 100%
+  - Progresso
+  - Duração
+  - Horas
