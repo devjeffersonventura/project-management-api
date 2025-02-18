@@ -4,103 +4,106 @@ API de gerenciamento de projetos e tarefas desenvolvida com Laravel 11.
 
 ## 🚀 Tecnologias
 
-- PHP 8.2
+- PHP 8.3
 - Laravel 11
-- MySQL
+- PostgreSQL
+- Docker
+- Nginx
 - Swagger/OpenAPI
 - Mailtrap (para emails em desenvolvimento)
 
 ## 📋 Pré-requisitos
 
-- PHP >= 8.2
-- Composer
-- MySQL
+- Docker Desktop
 - Git
 - Conta no Mailtrap (para testes de email)
 
-## ⚙️ Instalação
+## ⚙️ Instalação com Docker
 
 1. Clone o repositório
 ```bash
 git clone https://github.com/devjeffersonventura/project-management-api
 cd project-management-api
 ```
-2. Instale as dependências
-```bash
-composer install
-```
 
-3. Configure o ambiente
+2. Configure o ambiente
 ```bash
+# Copie o arquivo de ambiente
 cp .env.example .env
+```
+
+3. Construa e inicie os containers
+```bash
+# Construir os containers
+docker-compose build --no-cache
+
+# Iniciar os containers em background
+docker-compose up -d
+```
+
+4. Configure a aplicação
+```bash
+# Entre no container do backend
+docker-compose exec backend bash
+
+# Dentro do container:
+composer install
 php artisan key:generate
-```
-
-4. Configure o banco de dados no arquivo `.env`
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=seu_banco
-DB_USERNAME=seu_usuario
-DB_PASSWORD=sua_senha
-```
-
-5. Configure o Swagger no `.env`
-```env
-L5_SWAGGER_GENERATE_ALWAYS=true
-L5_SWAGGER_UI_PERSIST_AUTHORIZATION=true
-```
-
-6. Configure o Mailtrap no `.env`
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=seu_username_mailtrap
-MAIL_PASSWORD=seu_password_mailtrap
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=seu_email@exemplo.com
-MAIL_FROM_NAME="${APP_NAME}"
-```
-
-7. Execute as migrations
-```bash
 php artisan migrate
+php artisan storage:link
 ```
 
-8. Gere a documentação do Swagger
+## 🔧 Serviços Disponíveis
+
+- **API**: http://localhost:8000
+- **Banco de Dados**: localhost:5432
+- **Queue Worker**: Roda automaticamente via Supervisor
+
+## 📦 Comandos Docker Úteis
+
+### Gerenciamento de Containers
 ```bash
-php artisan l5-swagger:generate
+# Iniciar containers
+docker-compose up -d
+
+# Parar containers
+docker-compose down
+
+# Ver logs
+docker-compose logs -f
 ```
 
-9. Inicie o servidor
+### Banco de Dados
 ```bash
-php artisan serve
+# Acessar PostgreSQL
+docker-compose exec db psql -U postgres -d projectmanagement_db
+
+# Executar migrações
+docker-compose exec backend php artisan migrate
+
+# Resetar banco
+docker-compose exec backend php artisan migrate:fresh
 ```
 
-10. Inicie o worker que processa as job queues
+### Gerenciamento de Filas
 ```bash
-php artisan queue:work
+# Verificar status dos workers
+docker-compose exec backend supervisorctl status
+
+# Reiniciar workers
+docker-compose exec backend supervisorctl restart laravel-queue:*
+
+# Ver logs das filas
+docker-compose exec backend tail -f /var/log/supervisor/worker.log
 ```
 
 ## 🧪 Testes
 
-### Configuração
-O projeto utiliza PHPUnit para testes automatizados. Os testes são configurados para usar transações de banco de dados, garantindo que os dados de teste não persistam após a execução.
-
 ### Executando os Testes
-Executar todos os testes
 ```bash
-php artisan test
+# Dentro do container backend
+docker-compose exec backend php artisan test
 ```
-Executar testes específicos
-```bash
-php artisan test tests/Feature/UserRegistrationTest.php
-php artisan test tests/Unit/ProjectProgressCalculatorTest.php
-php artisan test tests/Unit/ProjectDurationCalculatorTest.php
-```
-
 
 ### Estrutura de Testes
 
@@ -113,34 +116,67 @@ php artisan test tests/Unit/ProjectDurationCalculatorTest.php
 
 #### Testes Unitários (Unit)
 - `ProjectProgressCalculatorTest`: Testa cálculos de progresso do projeto
-  - Porcentagem de tarefas completadas
-  - Tratamento de projetos sem tarefas
-  
 - `ProjectDurationCalculatorTest`: Testa cálculos de duração do projeto
-  - Dias estimados entre datas
-  - Tratamento de datas específicas
 
-### Factories
-O projeto utiliza factories para gerar dados de teste consistentes:
+## 🔍 Troubleshooting
 
-- `UserFactory`: Geração de usuários
-- `ProjectFactory`: Geração de projetos com status e datas
-- `TaskFactory`: Geração de tarefas com diferentes status
+### Problemas com Banco de Dados
+```bash
+# Verificar status do banco
+docker-compose ps db
 
-### Serviços Testados
-- `ProjectProgressCalculator`: Cálculo de progresso do projeto
-- `ProjectHoursCalculator`: Cálculo de horas do projeto
-- `ProjectDurationCalculator`: Cálculo de duração do projeto
+# Ver logs do banco
+docker-compose logs db
+```
 
-### Ambiente de Testes
-- Utiliza `DatabaseTransactions` para limpeza automática
-- Implementa Enums para validação de status
-- Dados realistas através de factories
-- Isolamento de banco de dados
+### Problemas com Permissões
+```bash
+# Corrigir permissões de storage
+docker-compose exec backend chown -R www-data:www-data /var/www/storage
+```
 
-### Cobertura de Testes
-- Registro de Usuário: 100%
-- Cálculos de Projeto: 100%
-  - Progresso
-  - Duração
-  - Horas
+### Problemas com Workers
+```bash
+# Verificar logs do supervisor
+docker-compose exec backend tail -f /var/log/supervisor/supervisord.log
+```
+
+## 🧹 Limpeza
+
+Para remover todos os containers e volumes:
+```bash
+# Parar e remover containers
+docker-compose down
+
+# Remover volumes
+docker-compose down -v
+
+# Remover containers/imagens não utilizados
+docker system prune -a
+```
+
+## 📝 Variáveis de Ambiente
+
+Principais variáveis necessárias no `.env`:
+```env
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=projectmanagement_db
+DB_USERNAME=postgres
+DB_PASSWORD=admin
+
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+CACHE_STORE=database
+
+L5_SWAGGER_GENERATE_ALWAYS=true
+L5_SWAGGER_UI_PERSIST_AUTHORIZATION=true
+```
+
+## 📚 Documentação API
+
+Acesse a documentação Swagger em:
+```
+http://localhost:8000/api/documentation
+```
